@@ -71,6 +71,12 @@ final class Expressions
      */
     public static function highlightSegment( $expression, $offset )
     {
-        return "<pre>1| $expression\n" . str_repeat("&nbsp;", $offset + 3) . "^</pre>";
+        $truncated =  htmlspecialchars(substr($expression, max(0, $offset - 25), 50));
+
+        if (strlen($truncated) < strlen($expression)) {
+            $truncated .= "...";
+        }
+
+        return "<pre>1| $truncated\n" . str_repeat("&nbsp;", $offset + 3) . "^</pre>";
     }
 }
