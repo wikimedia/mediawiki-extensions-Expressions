@@ -1,0 +1,12 @@
+{
+  "@metadata": {
+    "authors": [
+      "Marijn van Wezel"
+    ]
+  },
+  "expressions-extensionname": "Expressions",
+  "expressions-desc": "Enhances the parser with boolean algebra.",
+  "expressions-unidentified-token": "I got stuck here:<br/>$1I am not quite sure what is going on, but I recommend removing the highlighted token.",
+  "expressions-unclosed-paren": "I was expecting to see a closing parentheses next, but I got stuck here:<br/>$1Try adding a '<b>)</b>' to see if that helps.",
+  "expressions-unexpected-token": "I got stuck at the following character:<br/>$1I was expecting to see an <b>operator</b>, <b>expression</b> or <b>constant</b>, but instead I got '<b>$2</b>'."
+}

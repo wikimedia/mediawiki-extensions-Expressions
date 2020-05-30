@@ -1,0 +1,12 @@
+{
+  "@metadata": {
+    "authors": [
+      "Marijn van Wezel"
+    ]
+  },
+  "expressions-extensionname": "The name of the extension.",
+  "expressions-desc": "The description of the extension as shown on Special:Version.",
+  "expressions-unidentified-token": "Error message shown to the user when they entered an unknown token.",
+  "expressions-unclosed-paren": "Error message shown to the user when there is an unclosed parentheses.",
+  "expressions-unexpected-token": "Error message shown to the user when the parser came across a token it did not expect."
+}

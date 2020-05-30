@@ -1,0 +1,33 @@
+{
+  "manifest_version": 2,
+  "name": "Expressions",
+  "namemsg": "expressions-extensionname",
+  "type": "parserhook",
+  "author": [
+    "[https://mediawiki.org/wiki/User:Xxmarijnw Marijn van Wezel]"
+  ],
+  "version": "1.0",
+  "url": "https://mediawiki.org/wiki/Extension:Expressions",
+  "description": "Enhances the parser with boolean algebra.",
+  "descriptionmsg": "expressions-desc",
+  "license-name": "MIT",
+  "requires": {
+    "MediaWiki": ">= 1.27.0"
+  },
+  "MessagesDirs": {
+    "Expressions": [
+      "i18n"
+    ]
+  },
+  "ExtensionMessagesFiles": {
+    "ExpressionsMagic": "i18n/Expressions.i18n.php"
+  },
+  "AutoloadClasses": {
+    "Expressions\\Expressions": "src/Expressions.php"
+  },
+  "Hooks": {
+    "ParserFirstCallInit": [
+      "Expressions\\Expressions::onParserFirstCallInit"
+    ]
+  }
+}

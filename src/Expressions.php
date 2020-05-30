@@ -1,0 +1,76 @@
+<?php
+
+namespace Expressions;
+
+final class Expressions
+{
+    public static $expression_string;
+
+    /**
+     * @param \Parser $parser
+     */
+    public static function onParserFirstCallInit( \Parser $parser )
+    {
+        spl_autoload_register( function( $class ) {
+            $class_parts = explode( "\\", $class );
+            array_shift( $class_parts );
+
+            $path =  __DIR__ . "/" . implode( "/", $class_parts) . ".php";
+
+            include_once( $path );
+        } );
+
+        $parser->setFunctionHook( 'expression', [ self::class, 'evaluateExpression' ] );
+    }
+
+    /**
+     * @param \Parser $parser
+     * @param string $expression_string
+     * @param string $consequent
+     * @param string $alternate
+     * @return string|array
+     */
+    public static function evaluateExpression( \Parser $parser, $expression_string = '', $consequent = '', $alternate = '' )
+    {
+        self::$expression_string = $expression_string;
+
+        try {
+            $parser = new ExpressionParser( self::$expression_string );
+
+            $expression = $parser->parse();
+            $expression = ExpressionEvaluator::evaluate( $expression );
+
+            return $expression ? $consequent : $alternate;
+        } catch(ExpressionException $exception) {
+            return self::error( $exception->getMessageName(), $exception->getMessageParameters() );
+        }
+    }
+
+    /**
+     * @param $errormsg
+     * @param array $params
+     * @return array
+     */
+    public static function error( $errormsg, $params = [] )
+    {
+        return [
+            \Html::rawElement(
+                'span',
+                [ 'class' => 'error' ],
+                wfMessage( $errormsg, $params )->parse()
+            ), 'noparse' => true, 'isHTML' => false
+        ];
+    }
+
+    /**
+     * Highlights the given code segment at the given offset. Used for error reporting.
+     *
+     * @param $expression
+     * @param $offset
+     * @return string
+     */
+    public static function highlightSegment( $expression, $offset )
+    {
+        return "<pre>1| $expression\n" . str_repeat("&nbsp;", $offset + 3) . "^</pre>";
+    }
+}
