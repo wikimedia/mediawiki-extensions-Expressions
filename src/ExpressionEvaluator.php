@@ -50,7 +50,7 @@ class ExpressionEvaluator
                     throw new ExpressionException(
                         "expressions-invalid-operand",
                         [
-                            Expressions::highlightSegment( Expressions::$expression_string, $expression->getOffset() ),
+                            Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset()),
                             "number",
                             gettype($operands[0]->getValue())
                         ]
@@ -61,7 +61,7 @@ class ExpressionEvaluator
 
         throw new ExpressionException(
             "expressions-invalid-operand",
-            [ Expressions::highlightSegment( Expressions::$expression_string, $expression->getOffset() ) ]
+            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset())]
         );
     }
 }

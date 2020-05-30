@@ -30,13 +30,13 @@ class ExpressionParser
      */
     public function parse()
     {
-        if ( count( $this->tokens ) === 0 ) {
+        if (count($this->tokens) === 0) {
             return new ExpressionNode(null, null, null, null, null);
         }
 
         $ast = $this->equality();
 
-        if ( $this->current < count( $this->tokens ) ) {
+        if ($this->current < count($this->tokens)) {
             throw $this->error(
                 "expressions-unexpected-token",
                 $this->tokens[$this->current][2],
@@ -214,6 +214,61 @@ class ExpressionParser
     }
 
     /**
+     * Returns true and advances one token if the current token is any of the given token types.
+     *
+     * @return bool
+     */
+    private function match()
+    {
+        $tokens = func_get_args();
+
+        foreach ($tokens as $token) {
+            if ($this->check($token)) {
+                $this->advance();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the given token type is equal to the type of the current token.
+     *
+     * @param $token_type
+     * @return bool
+     */
+    private function check($token_type)
+    {
+        if ($this->atEnd()) {
+            return false;
+        }
+
+        return $this->tokens[$this->current][1] === $token_type;
+    }
+
+    /**
+     * Returns true if we ran out of tokens.
+     *
+     * @return bool
+     */
+    private function atEnd()
+    {
+        return $this->current >= count($this->tokens);
+    }
+
+    /**
+     * Consumes the current token and returns it.
+     *
+     * @return mixed
+     */
+    private function advance()
+    {
+        if (!$this->atEnd()) $this->current++;
+        return $this->tokens[$this->current - 1];
+    }
+
+    /**
      * @return ExpressionNode
      * @throws ExpressionException
      */
@@ -253,7 +308,7 @@ class ExpressionParser
             return new ExpressionNode(
                 null,
                 null,
-                substr( $this->tokens[$this->current - 1][0], 1, -1 ),
+                substr($this->tokens[$this->current - 1][0], 1, -1),
                 $this->tokens[$this->current - 1][1],
                 $this->tokens[$this->current - 1][2]
             );
@@ -298,60 +353,5 @@ class ExpressionParser
     {
         array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset));
         return new ExpressionException($errormsg, $additional_arguments);
-    }
-
-    /**
-     * Returns true and advances one token if the current token is any of the given token types.
-     *
-     * @return bool
-     */
-    private function match()
-    {
-        $tokens = func_get_args();
-
-        foreach ($tokens as $token) {
-            if ($this->check($token)) {
-                $this->advance();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the given token type is equal to the type of the current token.
-     *
-     * @param $token_type
-     * @return bool
-     */
-    private function check($token_type)
-    {
-        if ($this->atEnd()) {
-            return false;
-        }
-
-        return $this->tokens[$this->current][1] === $token_type;
-    }
-
-    /**
-     * Consumes the current token and returns it.
-     *
-     * @return mixed
-     */
-    private function advance()
-    {
-        if (!$this->atEnd()) $this->current++;
-        return $this->tokens[$this->current - 1];
-    }
-
-    /**
-     * Returns true if we ran out of tokens.
-     *
-     * @return bool
-     */
-    private function atEnd()
-    {
-        return $this->current >= count($this->tokens);
     }
 }

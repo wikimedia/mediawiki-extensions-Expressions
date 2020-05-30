@@ -9,18 +9,18 @@ final class Expressions
     /**
      * @param \Parser $parser
      */
-    public static function onParserFirstCallInit( \Parser $parser )
+    public static function onParserFirstCallInit(\Parser $parser)
     {
-        spl_autoload_register( function( $class ) {
-            $class_parts = explode( "\\", $class );
-            array_shift( $class_parts );
+        spl_autoload_register(function ($class) {
+            $class_parts = explode("\\", $class);
+            array_shift($class_parts);
 
-            $path =  __DIR__ . "/" . implode( "/", $class_parts) . ".php";
+            $path = __DIR__ . "/" . implode("/", $class_parts) . ".php";
 
-            include_once( $path );
-        } );
+            include_once($path);
+        });
 
-        $parser->setFunctionHook( 'expression', [ self::class, 'evaluateExpression' ] );
+        $parser->setFunctionHook('expression', [self::class, 'evaluateExpression']);
     }
 
     /**
@@ -30,19 +30,19 @@ final class Expressions
      * @param string $alternate
      * @return string|array
      */
-    public static function evaluateExpression( \Parser $parser, $expression_string = '', $consequent = '', $alternate = '' )
+    public static function evaluateExpression(\Parser $parser, $expression_string = '', $consequent = '', $alternate = '')
     {
         self::$expression_string = $expression_string;
 
         try {
-            $parser = new ExpressionParser( self::$expression_string );
+            $parser = new ExpressionParser(self::$expression_string);
 
             $expression = $parser->parse();
-            $expression = ExpressionEvaluator::evaluate( $expression );
+            $expression = ExpressionEvaluator::evaluate($expression);
 
             return $expression ? $consequent : $alternate;
-        } catch(ExpressionException $exception) {
-            return self::error( $exception->getMessageName(), $exception->getMessageParameters() );
+        } catch (ExpressionException $exception) {
+            return self::error($exception->getMessageName(), $exception->getMessageParameters());
         }
     }
 
@@ -51,13 +51,13 @@ final class Expressions
      * @param array $params
      * @return array
      */
-    public static function error( $errormsg, $params = [] )
+    public static function error($errormsg, $params = [])
     {
         return [
             \Html::rawElement(
                 'span',
-                [ 'class' => 'error' ],
-                wfMessage( $errormsg, $params )->parse()
+                ['class' => 'error'],
+                wfMessage($errormsg, $params)->parse()
             ), 'noparse' => true, 'isHTML' => false
         ];
     }
@@ -69,9 +69,9 @@ final class Expressions
      * @param $offset
      * @return string
      */
-    public static function highlightSegment( $expression, $offset )
+    public static function highlightSegment($expression, $offset)
     {
-        $truncated =  htmlspecialchars(substr($expression, max(0, $offset - 25), 50));
+        $truncated = htmlspecialchars(substr($expression, max(0, $offset - 25), 50));
 
         if (strlen($truncated) < strlen($expression)) {
             $truncated .= "...";

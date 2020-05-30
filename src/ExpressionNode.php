@@ -42,9 +42,9 @@ final class ExpressionNode
     {
         $this->operator = $operator;
         $this->operands = $operands;
-        $this->value    = $value;
-        $this->token    = $token;
-        $this->offset   = $offset;
+        $this->value = $value;
+        $this->token = $token;
+        $this->offset = $offset;
     }
 
     /**

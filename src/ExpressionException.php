@@ -2,12 +2,14 @@
 
 namespace Expressions;
 
+use Exception;
+
 /**
  * Class ExpressionException
  *
  * @package Expressions
  */
-class ExpressionException extends \Exception
+class ExpressionException extends Exception
 {
     /**
      * @var string
@@ -25,7 +27,7 @@ class ExpressionException extends \Exception
      * @param $message_name string Message key of the exception message.
      * @param array $message_parameters
      */
-    public function __construct( $message_name, $message_parameters = [] )
+    public function __construct($message_name, $message_parameters = [])
     {
         $this->message_name = $message_name;
         $this->message_parameters = $message_parameters;

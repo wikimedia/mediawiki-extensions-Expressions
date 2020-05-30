@@ -32,14 +32,14 @@ class ExpressionLexer
      * @return array An array of tokens
      * @throws ExpressionException
      */
-    public static function lex( $expression_string )
+    public static function lex($expression_string)
     {
         $tokens = [];
 
         $offset = 0;
-        while ($offset < strlen( $expression_string ) ) {
-            list( $match, $token ) = self::match( $expression_string, $offset, $offset_begin );
-            $tokens[] = [ $match, $token, $offset_begin ];
+        while ($offset < strlen($expression_string)) {
+            list($match, $token) = self::match($expression_string, $offset, $offset_begin);
+            $tokens[] = [$match, $token, $offset_begin];
         }
 
         return $tokens;
@@ -52,7 +52,7 @@ class ExpressionLexer
      * @return array
      * @throws ExpressionException
      */
-    public static function match( $expression_string, &$offset, &$offset_begin )
+    public static function match($expression_string, &$offset, &$offset_begin)
     {
         $string = substr($expression_string, $offset);
         $trimmed_string = ltrim($string);
@@ -74,7 +74,7 @@ class ExpressionLexer
 
         throw new ExpressionException(
             "expressions-unidentified-token",
-            [ Expressions::highlightSegment( $expression_string, $offset + $trim_size ) ]
+            [Expressions::highlightSegment($expression_string, $offset + $trim_size)]
         );
     }
 }
