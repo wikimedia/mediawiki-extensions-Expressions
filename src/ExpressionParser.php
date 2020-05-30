@@ -197,7 +197,7 @@ class ExpressionParser
      */
     private function unary()
     {
-        if ($this->match("T_NOT")) {
+        if ($this->match("T_NOT", "T_MINUS")) {
             $operator = $this->tokens[$this->current - 1];
             $right = $this->unary();
 

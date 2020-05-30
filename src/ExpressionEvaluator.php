@@ -45,6 +45,18 @@ class ExpressionEvaluator
                 return self::evaluate($operands[0]) < self::evaluate($operands[1]);
             case "T_NOT":
                 return !self::evaluate($operands[0]);
+            case "T_MINUS":
+                if (!is_double($operands[0]->getValue())) {
+                    throw new ExpressionException(
+                        "expressions-invalid-operand",
+                        [
+                            Expressions::highlightSegment( Expressions::$expression_string, $expression->getOffset() ),
+                            "number",
+                            gettype($operands[0]->getValue())
+                        ]
+                    );
+                }
+                return -self::evaluate($operands[0]);
         }
 
         throw new ExpressionException(

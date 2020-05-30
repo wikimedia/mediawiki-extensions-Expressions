@@ -10,9 +10,9 @@ class ExpressionLexer
         '/^(false)/' => "T_FALSE",
         '/^(true)/' => "T_TRUE",
         '/^(&&|\\/\\\\|and)/' => "T_CONJUNCTION",
-        '/^(\\|\\||\\\\\\/|or)/' => "T_DISJUNCTION",
+        '/^(\\\\\\/|or)/' => "T_DISJUNCTION",
         '/^(===|<->|<=>)/' => "T_EQUALITY",
-        '/^(!==|!<->|!<=>)/' => "T_NOT_EQUALITY",
+        '/^(!==|!<->|!<=>|<>)/' => "T_NOT_EQUALITY",
         '/^(==)/' => "T_EQUALS",
         '/^(!=)/' => "T_NOT_EQUALS",
         '/^(=>|->)/' => "T_IMPLICATION",
@@ -22,6 +22,7 @@ class ExpressionLexer
         '/^(>)/' => "T_GREATER",
         '/^(<)/' => "T_LESS",
         '/^(~|!)/' => "T_NOT",
+        '/^(\-)/' => "T_MINUS",
         '/^(\()/' => "T_LEFTPAREN",
         '/^(\))/' => "T_RIGHTPAREN"
     ];
