@@ -8,6 +8,6 @@
   "expressions-desc": "Enhances the parser with boolean algebra.",
   "expressions-unidentified-token": "I got stuck at the following token:<br/>$1I am not quite sure what is going on, but I recommend removing the highlighted token.",
   "expressions-unclosed-paren": "I was expecting to see a closing parentheses after the highlighted token:<br/>$1Try adding a '<b>)</b>' to see if that helps.",
-  "expressions-unexpected-token": "I got stuck at the following token:<br/>$1I was expecting to a different token; I got '<b>$2</b>'.",
+  "expressions-unexpected-token": "I got stuck at the following token:<br/>$1I was expecting to see something else, but I got '<b>$2</b>'.",
   "expressions-invalid-type": "I got stuck at the following token:<br/>$1I was expecting to see a <b>$2</b> at the highlighted token, but instead I got a '<b>$3</b>'."
 }
