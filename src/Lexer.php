@@ -74,7 +74,7 @@ class Lexer
 
         throw new ExpressionException(
             "expressions-unidentified-token",
-            [Expressions::highlightSegment($expression_string, $offset + $trim_size)]
+            [Expressions::highlightSegment($expression_string, $offset + $trim_size, 1)]
         );
     }
 }
