@@ -67,15 +67,20 @@ final class Expressions
      *
      * @param $expression
      * @param $offset
-     * @param bool $max_token_length
+     * @param int $max_token_length
+     * @param bool $force_highlight_beyond_whitespace
      * @return string
      */
-    public static function highlightSegment($expression, $offset, $max_token_length = 50)
+    public static function highlightSegment($expression, $offset, $max_token_length = 50, $force_highlight_beyond_whitespace = false)
     {
         $truncated = htmlspecialchars(substr($expression, max(0, $offset - 25), 50));
-        $relative_offset_next_space = strpos(substr($expression, $offset, 25), " ");
 
-        $token_length = $relative_offset_next_space !== false ? $relative_offset_next_space : strlen($expression) - $offset;
+        if ($force_highlight_beyond_whitespace) {
+            $token_length = $max_token_length;
+        } else {
+            $relative_offset_next_space = strpos(substr($expression, $offset, 25), " ");
+            $token_length = $relative_offset_next_space !== false ? $relative_offset_next_space : strlen($expression) - $offset;
+        }
 
         if (strlen($truncated) < strlen($expression)) {
             $truncated .= "...";

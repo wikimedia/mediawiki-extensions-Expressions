@@ -218,10 +218,22 @@ class Evaluator
         $actual_type = gettype(self::evaluate($expression));
 
         if ($actual_type !== $expected_type) {
-            $highlighted_segment = Expressions::highlightSegment(
-                Expressions::$expression_string,
-                $expression->getOffset()
-            );
+            if ($expression->getOperator() !== null) {
+                $left_offset = $expression->getOperands()[0]->getOffset();
+                $right_offset = $expression->getOperands()[1]->getOffset();
+
+                $highlighted_segment = Expressions::highlightSegment(
+                    Expressions::$expression_string,
+                    $left_offset,
+                    $right_offset - $left_offset + 1,
+                    true
+                );
+            } else {
+                $highlighted_segment = Expressions::highlightSegment(
+                    Expressions::$expression_string,
+                    $expression->getOffset()
+                );
+            }
 
             throw new ExpressionException(
                 "expressions-invalid-type",
