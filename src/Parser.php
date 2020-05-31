@@ -40,6 +40,7 @@ class Parser
             throw $this->error(
                 "expressions-unexpected-token",
                 $this->tokens[$this->current][2],
+                strlen($this->tokens[$this->current][0]),
                 [$this->tokens[$this->current][0]]
             );
         }
@@ -324,6 +325,7 @@ class Parser
         throw $this->error(
             "expressions-unexpected-token",
             $this->tokens[$this->current - 1][2],
+            strlen($this->tokens[$this->current - 1][0]),
             [$this->tokens[$this->current - 1][0]]
         );
     }
@@ -346,12 +348,13 @@ class Parser
     /**
      * @param $errormsg
      * @param $offset
+     * @param int $max_token_length
      * @param array $additional_arguments
      * @return ExpressionException
      */
-    private function error($errormsg, $offset, $additional_arguments = [])
+    private function error($errormsg, $offset, $max_token_length = 50, $additional_arguments = [])
     {
-        array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset));
+        array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset, $max_token_length));
         return new ExpressionException($errormsg, $additional_arguments);
     }
 }
