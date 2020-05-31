@@ -9,7 +9,7 @@ use Exception;
  *
  * @package Expressions
  */
-class ExpressionException extends Exception
+class ExpressionException extends \Exception
 {
     /**
      * @var string

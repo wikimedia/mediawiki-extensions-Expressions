@@ -8,5 +8,6 @@
   "expressions-desc": "The description of the extension as shown on Special:Version.",
   "expressions-unidentified-token": "Error message shown to the user when they entered an unknown token.",
   "expressions-unclosed-paren": "Error message shown to the user when there is an unclosed parentheses.",
-  "expressions-unexpected-token": "Error message shown to the user when the parser came across a token it did not expect."
+  "expressions-unexpected-token": "Error message shown to the user when the parser came across a token it did not expect.",
+  "expressions-invalid-type": "Error message shown to the user when the evaluator came across a type it did not expect."
 }

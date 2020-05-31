@@ -2,7 +2,7 @@
 
 namespace Expressions;
 
-final class ExpressionNode
+final class Node
 {
     /**
      * @var string|null
@@ -30,7 +30,7 @@ final class ExpressionNode
     private $token;
 
     /**
-     * ExpressionNode constructor.
+     * Node constructor.
      *
      * @param string|null $operator
      * @param array|null $operands

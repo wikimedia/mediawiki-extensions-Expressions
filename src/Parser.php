@@ -2,7 +2,7 @@
 
 namespace Expressions;
 
-class ExpressionParser
+class Parser
 {
     /**
      * @var array
@@ -15,23 +15,23 @@ class ExpressionParser
     private $current = 0;
 
     /**
-     * ExpressionParser constructor.
+     * Parser constructor.
      * @param string $expression_string
      * @throws ExpressionException
      */
     public function __construct($expression_string)
     {
-        $this->tokens = ExpressionLexer::lex($expression_string);
+        $this->tokens = Lexer::lex($expression_string);
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     public function parse()
     {
         if (count($this->tokens) === 0) {
-            return new ExpressionNode(null, null, null, null, null);
+            return new Node(null, null, null, null, null);
         }
 
         $ast = $this->equality();
@@ -48,7 +48,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function equality()
@@ -59,7 +59,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->implication();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -72,7 +72,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function implication()
@@ -83,7 +83,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->disjunction();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -96,7 +96,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function disjunction()
@@ -107,7 +107,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->conjunction();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -120,7 +120,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function conjunction()
@@ -131,7 +131,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->logical_xor();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -144,7 +144,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function logical_xor()
@@ -155,7 +155,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->comparison();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -168,7 +168,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function comparison()
@@ -179,7 +179,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->unary();
 
-            $expression = new ExpressionNode(
+            $expression = new Node(
                 $operator[1],
                 [$expression, $right],
                 $operator[0],
@@ -192,7 +192,7 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function unary()
@@ -201,7 +201,7 @@ class ExpressionParser
             $operator = $this->tokens[$this->current - 1];
             $right = $this->unary();
 
-            return new ExpressionNode(
+            return new Node(
                 $operator[1],
                 [$right],
                 $operator[0],
@@ -269,13 +269,13 @@ class ExpressionParser
     }
 
     /**
-     * @return ExpressionNode
+     * @return Node
      * @throws ExpressionException
      */
     private function primary()
     {
         if ($this->match("T_FALSE")) {
-            return new ExpressionNode(
+            return new Node(
                 null,
                 null,
                 false,
@@ -285,7 +285,7 @@ class ExpressionParser
         }
 
         if ($this->match("T_TRUE")) {
-            return new ExpressionNode(
+            return new Node(
                 null,
                 null,
                 true,
@@ -295,7 +295,7 @@ class ExpressionParser
         }
 
         if ($this->match("T_NUMBER")) {
-            return new ExpressionNode(
+            return new Node(
                 null,
                 null,
                 floatval($this->tokens[$this->current - 1][0]),
@@ -305,7 +305,7 @@ class ExpressionParser
         }
 
         if ($this->match("T_STRING")) {
-            return new ExpressionNode(
+            return new Node(
                 null,
                 null,
                 substr($this->tokens[$this->current - 1][0], 1, -1),

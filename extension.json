@@ -6,7 +6,7 @@
   "author": [
     "[https://mediawiki.org/wiki/User:Xxmarijnw Marijn van Wezel]"
   ],
-  "version": "1.0",
+  "version": "1.1",
   "url": "https://mediawiki.org/wiki/Extension:Expressions",
   "description": "Enhances the parser with boolean algebra.",
   "descriptionmsg": "expressions-desc",

@@ -35,10 +35,10 @@ final class Expressions
         self::$expression_string = $expression_string;
 
         try {
-            $parser = new ExpressionParser(self::$expression_string);
+            $parser = new Parser(self::$expression_string);
 
             $expression = $parser->parse();
-            $expression = ExpressionEvaluator::evaluate($expression);
+            $expression = Evaluator::evaluate($expression);
 
             return $expression ? $consequent : $alternate;
         } catch (ExpressionException $exception) {

@@ -2,7 +2,7 @@
 
 namespace Expressions;
 
-class ExpressionLexer
+class Lexer
 {
     const TOKEN = [
         '/^("(?:[^"\\\\]|\\\\.)*")/' => "T_STRING",
