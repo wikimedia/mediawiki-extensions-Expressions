@@ -37,7 +37,7 @@ class Evaluator
 
         throw new ExpressionException(
             "expressions-unexpected-token",
-            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset())]
+            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset(), strlen($expression->getValue()))]
         );
     }
 
@@ -225,13 +225,13 @@ class Evaluator
                 $highlighted_segment = Expressions::highlightSegment(
                     Expressions::$expression_string,
                     $left_offset,
-                    $right_offset - $left_offset + 1,
-                    true
+                    $right_offset - $left_offset + 1
                 );
             } else {
                 $highlighted_segment = Expressions::highlightSegment(
                     Expressions::$expression_string,
-                    $expression->getOffset()
+                    $expression->getOffset(),
+                    strlen($expression->getValue())
                 );
             }
 

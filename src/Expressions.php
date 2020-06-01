@@ -67,25 +67,26 @@ final class Expressions
      *
      * @param $expression
      * @param $offset
-     * @param int $max_token_length
-     * @param bool $force_highlight_beyond_whitespace
+     * @param $token_length
      * @return string
      */
-    public static function highlightSegment($expression, $offset, $max_token_length = 50, $force_highlight_beyond_whitespace = false)
+    public static function highlightSegment($expression, $offset, $token_length)
     {
-        $truncated = htmlspecialchars(substr($expression, max(0, $offset - 25), 50));
+        $max_expression_length = 60;
 
-        if ($force_highlight_beyond_whitespace) {
-            $token_length = $max_token_length;
-        } else {
-            $relative_offset_next_space = strpos(substr($expression, $offset, 25), " ");
-            $token_length = $relative_offset_next_space !== false ? $relative_offset_next_space : strlen($expression) - $offset;
-        }
+        $truncated = htmlspecialchars(
+            substr($expression, max(0, $offset - ($max_expression_length / 2)), $max_expression_length)
+        );
 
         if (strlen($truncated) < strlen($expression)) {
             $truncated .= "...";
         }
 
-        return "<pre>1| $truncated\n" . str_repeat("&nbsp;", $offset + 3) . str_repeat("^", min($max_token_length, $token_length)) . "</pre>";
+        if ($offset > ($max_expression_length / 2)) {
+            $truncated = "..." . $truncated;
+            $offset = $offset - ($offset - ($max_expression_length / 2)) + 3; // +3 because we add three dots.
+        }
+
+        return "<pre>1| $truncated\n" . str_repeat("&nbsp;", $offset + 3) . str_repeat("^", $token_length) . "</pre>";
     }
 }

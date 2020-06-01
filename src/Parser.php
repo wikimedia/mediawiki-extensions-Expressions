@@ -4,6 +4,13 @@ namespace Expressions;
 
 class Parser
 {
+    const VALUE_TOKEN_TYPES = [
+        "T_STRING",
+        "T_INT",
+        "T_FALSE",
+        "T_TRUE"
+    ];
+
     /**
      * @var array
      */
@@ -37,12 +44,7 @@ class Parser
         $ast = $this->equality();
 
         if ($this->current < count($this->tokens)) {
-            throw $this->error(
-                "expressions-unexpected-token",
-                $this->tokens[$this->current][2],
-                strlen($this->tokens[$this->current][0]),
-                [$this->tokens[$this->current][0]]
-            );
+            $this->throwUnexpectedTokenError($this->tokens[$this->current]);
         }
 
         return $ast;
@@ -317,17 +319,14 @@ class Parser
 
         if ($this->match("T_LEFTPAREN")) {
             $expression = $this->equality();
-            $this->consume("T_RIGHTPAREN", "expressions-unclosed-paren");
+            $this->consumeLeftParenthesis();
 
             return $expression;
         }
 
-        throw $this->error(
-            "expressions-unexpected-token",
-            $this->tokens[$this->current - 1][2],
-            strlen($this->tokens[$this->current - 1][0]),
-            [$this->tokens[$this->current - 1][0]]
-        );
+        $this->throwUnexpectedTokenError($this->tokens[$this->current - 1]);
+
+        return null;
     }
 
     /**
@@ -336,25 +335,58 @@ class Parser
      * @return mixed
      * @throws ExpressionException
      */
-    private function consume($token_type, $errormsg)
+    private function consumeLeftParenthesis()
     {
-        if ($this->check($token_type)) {
+        if ($this->check("T_RIGHTPAREN")) {
             return $this->advance();
         }
 
-        throw $this->error($errormsg, $this->tokens[$this->current - 1][2]);
+        // Find the offset of the last unclosed parenthesis.
+        $idx_current = strlen(Expressions::$expression_string);
+        $open_parenthesis = 1;
+
+        while ($open_parenthesis > 0) {
+            $character = Expressions::$expression_string[--$idx_current];
+
+            if ($character === '(') $open_parenthesis--;
+            if ($character === ')') $open_parenthesis++;
+        }
+
+        throw $this->error("expressions-unclosed-paren", $idx_current, 1);
+    }
+
+    /**
+     * @param $token
+     * @param $operator_location
+     * @param $value_location
+     * @throws ExpressionException
+     */
+    private function throwUnexpectedTokenError($token)
+    {
+        if (in_array($token[1], self::VALUE_TOKEN_TYPES)) {
+            $hint = wfMessage('expressions-unexpected-token-operator-hint')->plain();
+        } else {
+            $hint = wfMessage('expressions-unexpected-token-value-hint')->plain();
+        }
+
+        throw $this->error(
+            "expressions-unexpected-token",
+            $token[2],
+            strlen($token[0]),
+            [$token[0], $hint]
+        );
     }
 
     /**
      * @param $errormsg
      * @param $offset
-     * @param int $max_token_length
+     * @param int $token_length
      * @param array $additional_arguments
      * @return ExpressionException
      */
-    private function error($errormsg, $offset, $max_token_length = 50, $additional_arguments = [])
+    private function error($errormsg, $offset, $token_length = 50, $additional_arguments = [])
     {
-        array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset, $max_token_length));
+        array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset, $token_length));
         return new ExpressionException($errormsg, $additional_arguments);
     }
 }
