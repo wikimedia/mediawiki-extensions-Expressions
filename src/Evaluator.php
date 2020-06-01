@@ -219,8 +219,9 @@ class Evaluator
 
         if ($actual_type !== $expected_type) {
             if ($expression->getOperator() !== null) {
-                $left_offset = $expression->getOperands()[0]->getOffset();
-                $right_offset = $expression->getOperands()[1]->getOffset();
+                $is_binary = isset($expression->getOperands()[1]);
+                $left_offset = $is_binary ? $expression->getOperands()[0]->getOffset() : $expression->getOffset();
+                $right_offset = $is_binary ? $expression->getOperands()[1]->getOffset() : $expression->getOperands()[0]->getOffset();
 
                 $highlighted_segment = Expressions::highlightSegment(
                     Expressions::$expression_string,
