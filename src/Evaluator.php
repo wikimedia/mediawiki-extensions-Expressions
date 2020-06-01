@@ -221,12 +221,15 @@ class Evaluator
             if ($expression->getOperator() !== null) {
                 $is_binary = isset($expression->getOperands()[1]);
                 $left_offset = $is_binary ? $expression->getOperands()[0]->getOffset() : $expression->getOffset();
-                $right_offset = $is_binary ? $expression->getOperands()[1]->getOffset() : $expression->getOperands()[0]->getOffset();
+
+                $idx_right_operand = $is_binary ? 1 : 0;
+                $right_operand = $expression->getOperands()[$idx_right_operand];
+                $right_offset = $right_operand->getOffset() + strlen($right_operand->getValue());
 
                 $highlighted_segment = Expressions::highlightSegment(
                     Expressions::$expression_string,
                     $left_offset,
-                    $right_offset - $left_offset + 1
+                    $right_offset - $left_offset
                 );
             } else {
                 $highlighted_segment = Expressions::highlightSegment(
