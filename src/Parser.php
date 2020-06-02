@@ -41,7 +41,13 @@ class Parser
             return new Node(null, null, null, null, null);
         }
 
-        return $this->expression();
+        $ast = $this->expression();
+
+        if ($this->current < count($this->tokens)) {
+            $this->throwUnexpectedTokenError($this->current());
+        }
+
+        return $ast;
     }
 
     /**
