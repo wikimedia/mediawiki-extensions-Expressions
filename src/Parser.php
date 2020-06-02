@@ -4,11 +4,13 @@ namespace Expressions;
 
 class Parser
 {
-    const VALUE_TOKEN_TYPES = [
+    const VALUE_HINT_TOKEN_TYPES = [
         "T_STRING",
         "T_NUMBER",
         "T_FALSE",
-        "T_TRUE"
+        "T_TRUE",
+        "T_RIGHTPAREN",
+        "T_LEFTPAREN"
     ];
 
     /**
@@ -419,7 +421,7 @@ class Parser
      */
     private function throwUnexpectedTokenError(Token $token)
     {
-        if (in_array($token->getTokenType(), self::VALUE_TOKEN_TYPES)) {
+        if (in_array($token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES)) {
             $hint = wfMessage('expressions-unexpected-token-operator-hint')->plain();
         } else {
             $hint = wfMessage('expressions-unexpected-token-value-hint')->plain();
