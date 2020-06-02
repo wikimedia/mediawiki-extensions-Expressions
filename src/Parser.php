@@ -41,6 +41,17 @@ class Parser
             return new Node(null, null, null, null, null);
         }
 
+        return $this->parseExpression();
+    }
+
+    /**
+     * This is the parse() method without the initial empty-case check.
+     *
+     * @return Node
+     * @throws ExpressionException
+     */
+    private function parseExpression()
+    {
         $ast = $this->equality();
 
         if ($this->current < count($this->tokens)) {
@@ -341,8 +352,8 @@ class Parser
 
         if ($this->match("T_LEFTPAREN")) {
             $start_offset = $this->previous()->getOffset();
-            $expression = $this->equality();
-            $this->consumeLeftParenthesis();
+            $expression = $this->parseExpression();
+            $this->consumeRightParenthesis();
 
             $end_offset = $this->previous()->getOffset() + 1;
 
@@ -361,7 +372,7 @@ class Parser
      * @return Token
      * @throws ExpressionException
      */
-    private function consumeLeftParenthesis()
+    private function consumeRightParenthesis()
     {
         if ($this->check("T_RIGHTPAREN")) {
             return $this->advance();
@@ -371,7 +382,7 @@ class Parser
         $idx_current = strlen(Expressions::$expression_string);
         $open_parenthesis = 1;
 
-        while ($open_parenthesis > 0) {
+        while ($open_parenthesis > 0 && $idx_current > 0) {
             $character = Expressions::$expression_string[--$idx_current];
 
             if ($character === '(') $open_parenthesis--;
