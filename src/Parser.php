@@ -44,7 +44,7 @@ class Parser
         $ast = $this->equality();
 
         if ($this->current < count($this->tokens)) {
-            $this->throwUnexpectedTokenError($this->tokens[$this->current]);
+            $this->throwUnexpectedTokenError($this->current());
         }
 
         return $ast;
@@ -56,18 +56,19 @@ class Parser
      */
     private function equality()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->implication();
 
         while ($this->match("T_NOT_EQUALS", "T_NOT_EQUALITY", "T_EQUALS", "T_EQUALITY")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->implication();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -80,18 +81,19 @@ class Parser
      */
     private function implication()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->disjunction();
 
         while ($this->match("T_IMPLICATION")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->disjunction();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -104,18 +106,19 @@ class Parser
      */
     private function disjunction()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->conjunction();
 
         while ($this->match("T_DISJUNCTION")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->conjunction();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -128,18 +131,19 @@ class Parser
      */
     private function conjunction()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->logical_xor();
 
         while ($this->match("T_CONJUNCTION")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->logical_xor();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -152,18 +156,19 @@ class Parser
      */
     private function logical_xor()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->comparison();
 
         while ($this->match("T_XOR")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->comparison();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -176,18 +181,19 @@ class Parser
      */
     private function comparison()
     {
+        $offset_start = $this->current()->getOffset();
         $expression = $this->unary();
 
         while ($this->match("T_GREATER", "T_LESS", "T_GREATEREQUAL", "T_LESSEQUAL")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->unary();
 
             $expression = new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$expression, $right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $offset_start,
+                $right->getOffsetEnd()
             );
         }
 
@@ -201,15 +207,15 @@ class Parser
     private function unary()
     {
         if ($this->match("T_NOT", "T_MINUS")) {
-            $operator = $this->tokens[$this->current - 1];
+            $operator = $this->previous();
             $right = $this->unary();
 
             return new Node(
-                $operator[1],
+                $operator->getTokenType(),
                 [$right],
-                $operator[0],
-                $operator[1],
-                $operator[2]
+                $operator->getMatch(),
+                $operator->getOffset(),
+                $right->getOffsetEnd()
             );
         }
 
@@ -247,7 +253,7 @@ class Parser
             return false;
         }
 
-        return $this->tokens[$this->current][1] === $token_type;
+        return $this->current()->getTokenType() === $token_type;
     }
 
     /**
@@ -263,11 +269,27 @@ class Parser
     /**
      * Consumes the current token and returns it.
      *
-     * @return mixed
+     * @return Token
      */
     private function advance()
     {
         if (!$this->atEnd()) $this->current++;
+        return $this->previous();
+    }
+
+    /**
+     * @return Token
+     */
+    private function current()
+    {
+        return $this->tokens[$this->current];
+    }
+
+    /**
+     * @return Token
+     */
+    private function previous()
+    {
         return $this->tokens[$this->current - 1];
     }
 
@@ -282,8 +304,8 @@ class Parser
                 null,
                 null,
                 false,
-                "T_FALSE",
-                $this->tokens[$this->current - 1][2]
+                $this->previous()->getOffset(),
+                $this->previous()->getOffset() + 5
             );
         }
 
@@ -292,8 +314,8 @@ class Parser
                 null,
                 null,
                 true,
-                $this->tokens[$this->current - 1][1],
-                $this->tokens[$this->current - 1][2]
+                $this->previous()->getOffset(),
+                $this->previous()->getOffset() + 4
             );
         }
 
@@ -301,9 +323,9 @@ class Parser
             return new Node(
                 null,
                 null,
-                floatval($this->tokens[$this->current - 1][0]),
-                $this->tokens[$this->current - 1][1],
-                $this->tokens[$this->current - 1][2]
+                floatval($this->previous()->getMatch()),
+                $this->previous()->getOffset(),
+                $this->previous()->getOffset() + strlen((string)$this->previous()->getMatch())
             );
         }
 
@@ -311,28 +333,32 @@ class Parser
             return new Node(
                 null,
                 null,
-                substr($this->tokens[$this->current - 1][0], 1, -1),
-                $this->tokens[$this->current - 1][1],
-                $this->tokens[$this->current - 1][2]
+                substr($this->previous()->getMatch(), 1, -1),
+                $this->previous()->getOffset(),
+                $this->previous()->getOffset() + strlen($this->previous()->getMatch())
             );
         }
 
         if ($this->match("T_LEFTPAREN")) {
+            $start_offset = $this->previous()->getOffset();
             $expression = $this->equality();
             $this->consumeLeftParenthesis();
+
+            $end_offset = $this->previous()->getOffset() + 1;
+
+            $expression->setOffsetStart($start_offset);
+            $expression->setOffsetEnd($end_offset);
 
             return $expression;
         }
 
-        $this->throwUnexpectedTokenError($this->tokens[$this->current - 1]);
+        $this->throwUnexpectedTokenError($this->previous());
 
         return null;
     }
 
     /**
-     * @param $token_type
-     * @param $errormsg
-     * @return mixed
+     * @return Token
      * @throws ExpressionException
      */
     private function consumeLeftParenthesis()
@@ -356,28 +382,6 @@ class Parser
     }
 
     /**
-     * @param $token
-     * @param $operator_location
-     * @param $value_location
-     * @throws ExpressionException
-     */
-    private function throwUnexpectedTokenError($token)
-    {
-        if (in_array($token[1], self::VALUE_TOKEN_TYPES)) {
-            $hint = wfMessage('expressions-unexpected-token-operator-hint')->plain();
-        } else {
-            $hint = wfMessage('expressions-unexpected-token-value-hint')->plain();
-        }
-
-        throw $this->error(
-            "expressions-unexpected-token",
-            $token[2],
-            strlen($token[0]),
-            [$token[0], $hint]
-        );
-    }
-
-    /**
      * @param $errormsg
      * @param $offset
      * @param int $token_length
@@ -386,7 +390,31 @@ class Parser
      */
     private function error($errormsg, $offset, $token_length = 50, $additional_arguments = [])
     {
-        array_unshift($additional_arguments, Expressions::highlightSegment(Expressions::$expression_string, $offset, $token_length));
+        array_unshift(
+            $additional_arguments,
+            Expressions::highlightSegment(Expressions::$expression_string, $offset, $token_length)
+        );
+
         return new ExpressionException($errormsg, $additional_arguments);
+    }
+
+    /**
+     * @param Token $token
+     * @throws ExpressionException
+     */
+    private function throwUnexpectedTokenError(Token $token)
+    {
+        if (in_array($token->getTokenType(), self::VALUE_TOKEN_TYPES)) {
+            $hint = wfMessage('expressions-unexpected-token-operator-hint')->plain();
+        } else {
+            $hint = wfMessage('expressions-unexpected-token-value-hint')->plain();
+        }
+
+        throw $this->error(
+            "expressions-unexpected-token",
+            $token->getOffset(),
+            strlen($token->getMatch()),
+            [$token->getMatch(), $hint]
+        );
     }
 }

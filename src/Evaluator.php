@@ -14,8 +14,10 @@ class Evaluator
         $operator = $expression->getOperator();
         $operands = $expression->getOperands();
 
+        $value = $expression->getValue();
+
         if ($operator === null) {
-            return $expression->getValue();
+            return $value;
         }
 
         switch ($operator) {
@@ -27,17 +29,17 @@ class Evaluator
             case "T_NOT_EQUALS":    return self::evaluateNotEquals($operands[0], $operands[1]);
             case "T_IMPLICATION":   return self::evaluateImplication($operands[0], $operands[1]);
             case "T_XOR":           return self::evaluateXor($operands[0], $operands[1]);
-            case "T_GREATEREQUAL":  return self::evaluateGreaterEqual($operands[0], $operands[1]);
-            case "T_LESSEQUAL":     return self::evaluateLessEqual($operands[0], $operands[1]);
-            case "T_GREATER":       return self::evaluateGreater($operands[0], $operands[1]);
-            case "T_LESS":          return self::evaluateLess($operands[0], $operands[1]);
-            case "T_NOT":           return self::evaluateNot($operands[0]);
-            case "T_MINUS":         return self::evaluateMinus($operands[0]);
+            case "T_GREATEREQUAL":  return self::evaluateGreaterEqual($operands[0], $operands[1], $value);
+            case "T_LESSEQUAL":     return self::evaluateLessEqual($operands[0], $operands[1], $value);
+            case "T_GREATER":       return self::evaluateGreater($operands[0], $operands[1], $value);
+            case "T_LESS":          return self::evaluateLess($operands[0], $operands[1], $value);
+            case "T_NOT":           return self::evaluateNot($operands[0], $value);
+            case "T_MINUS":         return self::evaluateMinus($operands[0], $value);
         }
 
         throw new ExpressionException(
             "expressions-unexpected-token",
-            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset(), strlen($expression->getValue()))]
+            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffsetStart(), strlen($expression->getValue()))]
         );
     }
 
@@ -132,13 +134,15 @@ class Evaluator
     /**
      * @param Node $left
      * @param Node $right
+     * @param string $operator
      * @return bool
      * @throws ExpressionException
      */
-    private static function evaluateGreaterEqual(Node $left, Node $right)
+    private static function evaluateGreaterEqual(Node $left, Node $right, $operator)
     {
-        self::matchType("double", $left);
-        self::matchType("double", $right);
+        self::matchType("double", "expressions-binary-left-type-exception", $operator, $left);
+        self::matchType("double", "expressions-binary-right-type-exception", $operator, $right);
+
 
         return self::evaluate($left) >= self::evaluate($right);
     }
@@ -146,13 +150,14 @@ class Evaluator
     /**
      * @param Node $left
      * @param Node $right
+     * @param string $operator
      * @return bool
      * @throws ExpressionException
      */
-    private static function evaluateLessEqual(Node $left, Node $right)
+    private static function evaluateLessEqual(Node $left, Node $right, $operator)
     {
-        self::matchType("double", $left);
-        self::matchType("double", $right);
+        self::matchType("double", "expressions-binary-left-type-exception", $operator, $left);
+        self::matchType("double", "expressions-binary-right-type-exception", $operator, $right);
 
         return self::evaluate($left) <= self::evaluate($right);
     }
@@ -160,13 +165,14 @@ class Evaluator
     /**
      * @param Node $left
      * @param Node $right
+     * @param string $operator
      * @return bool
      * @throws ExpressionException
      */
-    private static function evaluateGreater(Node $left, Node $right)
+    private static function evaluateGreater(Node $left, Node $right, $operator)
     {
-        self::matchType("double", $left);
-        self::matchType("double", $right);
+        self::matchType("double", "expressions-binary-left-type-exception", $operator, $left);
+        self::matchType("double", "expressions-binary-right-type-exception", $operator, $right);
 
         return self::evaluate($left) > self::evaluate($right);
     }
@@ -174,74 +180,79 @@ class Evaluator
     /**
      * @param Node $left
      * @param Node $right
+     * @param string $operator
      * @return bool
      * @throws ExpressionException
      */
-    private static function evaluateLess(Node $left, Node $right)
+    private static function evaluateLess(Node $left, Node $right, $operator)
     {
-        self::matchType("double", $left);
-        self::matchType("double", $right);
+        self::matchType("double", "expressions-binary-left-type-exception", $operator, $left);
+        self::matchType("double", "expressions-binary-right-type-exception", $operator, $right);
 
         return self::evaluate($left) < self::evaluate($right);
     }
 
     /**
      * @param Node $expression
+     * @param string $operator
      * @return bool
      * @throws ExpressionException
      */
-    private static function evaluateNot(Node $expression)
+    private static function evaluateNot(Node $expression, $operator)
     {
-        self::matchType("boolean", $expression);
+        self::matchType(
+            "boolean",
+            "expressions-unary-type-exception",
+            $operator,
+            $expression
+        );
 
         return !self::evaluate($expression);
     }
 
     /**
      * @param Node $expression
+     * @param string $operator
      * @return int
      * @throws ExpressionException
      */
-    private static function evaluateMinus(Node $expression)
+    private static function evaluateMinus(Node $expression, $operator)
     {
-        self::matchType("double", $expression);
+        self::matchType(
+            "double",
+            "expressions-unary-type-exception",
+            $operator,
+            $expression
+        );
 
         return -self::evaluate($expression);
     }
 
     /**
      * @param $expected_type
+     * @param string $errormsg
+     * @param string $operator
      * @param Node $expression
      * @throws ExpressionException
      */
-    private static function matchType($expected_type, Node $expression) {
+    private static function matchType($expected_type, $errormsg, $operator, Node $expression) {
         $actual_type = gettype(self::evaluate($expression));
 
         if ($actual_type !== $expected_type) {
-            if ($expression->getOperator() !== null) {
-                $is_binary = isset($expression->getOperands()[1]);
-                $left_offset = $is_binary ? $expression->getOperands()[0]->getOffset() : $expression->getOffset();
-
-                $idx_right_operand = $is_binary ? 1 : 0;
-                $right_operand = $expression->getOperands()[$idx_right_operand];
-                $right_offset = $right_operand->getOffset() + strlen($right_operand->getValue());
-
-                $highlighted_segment = Expressions::highlightSegment(
-                    Expressions::$expression_string,
-                    $left_offset,
-                    $right_offset - $left_offset
-                );
-            } else {
-                $highlighted_segment = Expressions::highlightSegment(
-                    Expressions::$expression_string,
-                    $expression->getOffset(),
-                    strlen($expression->getValue())
-                );
-            }
+            $highlighted_segment = Expressions::highlightSegment(
+                Expressions::$expression_string,
+                $expression->getOffsetStart(),
+                $expression->getOffsetEnd() - $expression->getOffsetStart()
+            );
 
             throw new ExpressionException(
                 "expressions-invalid-type",
-                [$highlighted_segment, $expected_type, $actual_type]
+                [
+                    $highlighted_segment,
+                    $expected_type,
+                    $actual_type,
+                    wfMessage($errormsg, $operator, $expected_type)->plain()
+                ]
             );
         }
     }
