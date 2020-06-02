@@ -30,26 +30,19 @@ final class Node
     private $offset_end;
 
     /**
-     * @var string
-     */
-    private $token;
-
-    /**
      * Node constructor.
      *
      * @param string|null $operator
      * @param array|null $operands
      * @param string $value
-     * @param string $token
      * @param int $offset_start
      * @param int $offset_end
      */
-    public function __construct($operator, $operands, $value, $token, $offset_start, $offset_end)
+    public function __construct($operator, $operands, $value, $offset_start, $offset_end)
     {
         $this->operator = $operator;
         $this->operands = $operands;
         $this->value = $value;
-        $this->token = $token;
         $this->offset_start = $offset_start;
         $this->offset_end = $offset_end;
     }
@@ -73,9 +66,9 @@ final class Node
     /**
      * @return int
      */
-    public function getOffsetStart()
+    public function getOffsetEnd()
     {
-        return $this->offset_start;
+        return $this->offset_end;
     }
 
     /**
@@ -89,8 +82,24 @@ final class Node
     /**
      * @return int
      */
-    public function getOffsetEnd()
+    public function getOffsetStart()
     {
-        return $this->offset_end;
+        return $this->offset_start;
+    }
+
+    /**
+     * @param int $offset
+     */
+    public function setOffsetStart($offset)
+    {
+        $this->offset_start = $offset;
+    }
+
+    /**
+     * @param int $offset
+     */
+    public function setOffsetEnd($offset)
+    {
+        $this->offset_end = $offset;
     }
 }
