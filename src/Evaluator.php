@@ -37,7 +37,7 @@ class Evaluator
 
         throw new ExpressionException(
             "expressions-unexpected-token",
-            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffset(), strlen($expression->getValue()))]
+            [Expressions::highlightSegment(Expressions::$expression_string, $expression->getOffsetStart(), strlen($expression->getValue()))]
         );
     }
 
@@ -218,26 +218,11 @@ class Evaluator
         $actual_type = gettype(self::evaluate($expression));
 
         if ($actual_type !== $expected_type) {
-            if ($expression->getOperator() !== null) {
-                $is_binary = isset($expression->getOperands()[1]);
-                $left_offset = $is_binary ? $expression->getOperands()[0]->getOffset() : $expression->getOffset();
-
-                $idx_right_operand = $is_binary ? 1 : 0;
-                $right_operand = $expression->getOperands()[$idx_right_operand];
-                $right_offset = $right_operand->getOffset() + strlen($right_operand->getValue());
-
-                $highlighted_segment = Expressions::highlightSegment(
-                    Expressions::$expression_string,
-                    $left_offset,
-                    $right_offset - $left_offset
-                );
-            } else {
-                $highlighted_segment = Expressions::highlightSegment(
-                    Expressions::$expression_string,
-                    $expression->getOffset(),
-                    strlen($expression->getValue())
-                );
-            }
+            $highlighted_segment = Expressions::highlightSegment(
+                Expressions::$expression_string,
+                $expression->getOffsetStart(),
+                $expression->getLength()
+            );
 
             throw new ExpressionException(
                 "expressions-invalid-type",
