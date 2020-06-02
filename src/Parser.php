@@ -429,7 +429,7 @@ class Parser
             "expressions-unexpected-token",
             $token->getOffset(),
             strlen($token->getMatch()),
-            [$token->getMatch(), $hint]
+            [htmlspecialchars($token->getMatch()), $hint]
         );
     }
 }
