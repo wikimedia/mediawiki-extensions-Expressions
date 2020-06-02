@@ -75,9 +75,8 @@ final class Expressions
         $max_expression_length = 60;
 
         $truncated = mb_substr($expression, max(0, $offset - ($max_expression_length / 2)), $max_expression_length);
-        $truncated_length = strlen($truncated);
 
-        if ($truncated_length < strlen($expression)) {
+        if (strlen($truncated) < strlen($expression)) {
             $truncated .= "...";
         }
 
@@ -86,8 +85,8 @@ final class Expressions
             $offset = $offset - ($offset - ($max_expression_length / 2)) + 3; // +3 because we add three dots.
         }
 
-        if ($offset + $token_length > $truncated_length) {
-            $token_length = $truncated_length - $offset + 3; // +3 because we add three dots.
+        if ($offset + $token_length > strlen($truncated)) {
+            $token_length = strlen($truncated) - $offset;
         }
 
         $truncated = htmlspecialchars($truncated);
