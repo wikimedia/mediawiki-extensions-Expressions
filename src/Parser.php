@@ -6,7 +6,7 @@ class Parser
 {
     const VALUE_TOKEN_TYPES = [
         "T_STRING",
-        "T_INT",
+        "T_NUMBER",
         "T_FALSE",
         "T_TRUE"
     ];
