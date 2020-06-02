@@ -41,7 +41,7 @@ class Parser
             return new Node(null, null, null, null, null);
         }
 
-        return $this->parseExpression();
+        return $this->expression();
     }
 
     /**
@@ -50,15 +50,9 @@ class Parser
      * @return Node
      * @throws ExpressionException
      */
-    private function parseExpression()
+    private function expression()
     {
-        $ast = $this->equality();
-
-        if ($this->current < count($this->tokens)) {
-            $this->throwUnexpectedTokenError($this->current());
-        }
-
-        return $ast;
+        return $this->equality();
     }
 
     /**
@@ -352,7 +346,7 @@ class Parser
 
         if ($this->match("T_LEFTPAREN")) {
             $start_offset = $this->previous()->getOffset();
-            $expression = $this->parseExpression();
+            $expression = $this->expression();
             $this->consumeRightParenthesis();
 
             $end_offset = $this->previous()->getOffset() + 1;
@@ -376,6 +370,10 @@ class Parser
     {
         if ($this->check("T_RIGHTPAREN")) {
             return $this->advance();
+        }
+
+        if (!$this->atEnd()) {
+            $this->throwUnexpectedTokenError($this->current());
         }
 
         // Find the offset of the last unclosed parenthesis.
