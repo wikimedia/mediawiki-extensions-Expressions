@@ -90,7 +90,8 @@ final class Expressions
         }
 
         $truncated = htmlspecialchars($truncated);
+        $truncated = str_replace(" ", "&nbsp;", $truncated); // Replace all spaces with non-breakable spaces to prevent linebreaks in the error
 
-        return "<pre>1| $truncated\n" . str_repeat("&nbsp;", $offset + 3) . str_repeat("^", $token_length) . "</pre>";
+        return "<pre>1|&nbsp;$truncated\n" . str_repeat("&nbsp;", $offset + 3) . str_repeat("^", $token_length) . "</pre>";
     }
 }
