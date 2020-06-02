@@ -74,11 +74,10 @@ final class Expressions
     {
         $max_expression_length = 60;
 
-        $truncated = htmlspecialchars(
-            substr($expression, max(0, $offset - ($max_expression_length / 2)), $max_expression_length)
-        );
+        $truncated = mb_substr($expression, max(0, $offset - ($max_expression_length / 2)), $max_expression_length);
+        $truncated_length = strlen($truncated);
 
-        if (strlen($truncated) < strlen($expression)) {
+        if ($truncated_length < strlen($expression)) {
             $truncated .= "...";
         }
 
@@ -86,6 +85,12 @@ final class Expressions
             $truncated = "..." . $truncated;
             $offset = $offset - ($offset - ($max_expression_length / 2)) + 3; // +3 because we add three dots.
         }
+
+        if ($offset + $token_length > $truncated_length) {
+            $token_length = $truncated_length - $offset + 3; // +3 because we add three dots.
+        }
+
+        $truncated = htmlspecialchars($truncated);
 
         return "<pre>1| $truncated\n" . str_repeat("&nbsp;", $offset + 3) . str_repeat("^", $token_length) . "</pre>";
     }
