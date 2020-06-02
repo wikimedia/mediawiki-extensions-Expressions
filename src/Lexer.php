@@ -38,8 +38,8 @@ class Lexer
 
         $offset = 0;
         while ($offset < strlen($expression_string)) {
-            list($match, $token) = self::match($expression_string, $offset, $offset_begin);
-            $tokens[] = [$match, $token, $offset_begin];
+            list($match, $token) = self::match($expression_string, $offset, $offset_start);
+            $tokens[] = new Token($match, $token, $offset_start);
         }
 
         return $tokens;
@@ -48,18 +48,18 @@ class Lexer
     /**
      * @param $expression_string
      * @param $offset
-     * @param $offset_begin
+     * @param $offset_start
      * @return array
      * @throws ExpressionException
      */
-    public static function match($expression_string, &$offset, &$offset_begin)
+    public static function match($expression_string, &$offset, &$offset_start)
     {
         $string = substr($expression_string, $offset);
         $trimmed_string = ltrim($string);
 
         $trim_size = strlen($string) - strlen($trimmed_string);
 
-        $offset_begin = $offset + $trim_size;
+        $offset_start = $offset + $trim_size;
 
         foreach (self::TOKEN as $regex_pattern => $token_identifier) {
             if (preg_match($regex_pattern, $trimmed_string, $matches) === 1) {

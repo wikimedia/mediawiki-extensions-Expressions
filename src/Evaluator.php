@@ -221,7 +221,7 @@ class Evaluator
             $highlighted_segment = Expressions::highlightSegment(
                 Expressions::$expression_string,
                 $expression->getOffsetStart(),
-                $expression->getLength()
+                $expression->getOffsetEnd() - $expression->getOffsetStart()
             );
 
             throw new ExpressionException(
