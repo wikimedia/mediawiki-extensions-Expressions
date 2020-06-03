@@ -9,7 +9,6 @@ class Parser
         "T_NUMBER",
         "T_FALSE",
         "T_TRUE",
-        "T_RIGHTPAREN",
         "T_LEFTPAREN"
     ];
 
@@ -239,6 +238,7 @@ class Parser
      * Returns true and advances one token if the current token is any of the given token types.
      *
      * @return bool
+     * @throws ExpressionException
      */
     private function match()
     {
@@ -259,6 +259,7 @@ class Parser
      *
      * @param $token_type
      * @return bool
+     * @throws ExpressionException
      */
     private function check($token_type)
     {
@@ -297,7 +298,7 @@ class Parser
      */
     private function current()
     {
-        if ($this->atEnd()) $this->throwUnexpectedTokenError($this->previous());
+        if ($this->atEnd()) $this->throwUnexpectedTokenError($this->previous(), "expressions-after");
         return $this->tokens[$this->current];
     }
 
@@ -307,7 +308,7 @@ class Parser
      */
     private function previous()
     {
-        if ($this->current === 0) $this->throwUnexpectedTokenError($this->current());
+        if ($this->current === 0) $this->throwUnexpectedTokenError($this->current(), "expressions-before");
         return $this->tokens[$this->current - 1];
     }
 
@@ -370,7 +371,7 @@ class Parser
             return $expression;
         }
 
-        $this->throwUnexpectedTokenError($this->previous());
+        $this->throwUnexpectedTokenError($this->current(), "expressions-before");
 
         return null;
     }
@@ -422,14 +423,20 @@ class Parser
 
     /**
      * @param Token $token
+     * @param string|null $location_hintmsg
+     * @param string|null $hintmsg
      * @throws ExpressionException
      */
-    private function throwUnexpectedTokenError(Token $token)
+    private function throwUnexpectedTokenError(Token $token, $location_hintmsg = null)
     {
-        if (in_array($token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES)) {
-            $hint = wfMessage('expressions-unexpected-token-operator-hint')->plain();
+        if ($token->getTokenType() === "T_RIGHTPAREN") {
+            $hint = wfMessage('expressions-unexpected-token-rightparen-hint')->plain();
+        } else if (in_array($token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES)) {
+            $location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-before";
+            $hint = wfMessage('expressions-unexpected-token-operator-hint', wfMessage($location_hintmsg)->plain())->plain();
         } else {
-            $hint = wfMessage('expressions-unexpected-token-value-hint')->plain();
+            $location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-after";
+            $hint = wfMessage('expressions-unexpected-token-value-hint', wfMessage($location_hintmsg)->plain())->plain();
         }
 
         throw $this->error(

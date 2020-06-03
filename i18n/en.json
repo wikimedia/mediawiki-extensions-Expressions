@@ -10,8 +10,11 @@
   "expressions-unclosed-paren": "I was expecting a closing parenthesis, because the highlighted parenthesis was not closed, but instead I reached the end of the expression:<br/>$1Try adding a '<b>)</b>' at the end of the expression to see if that helps.",
   "expressions-unexpected-token": "I got stuck at the following token:<br/>$1I was expecting to see an <b>operator</b> followed by a <b>value</b>, but instead I got '<b>$2</b>'. $3",
   "expressions-invalid-type": "I got stuck at the following location:<br/>$1I was expecting to see a <b>$2</b> at the highlighted location, because $4, but instead I got a <b>$3</b>.",
-  "expressions-unexpected-token-value-hint": "Try adding a <b>value</b> after the highlighted token to see if that helps.",
-  "expressions-unexpected-token-operator-hint": "Try adding an <b>operator</b> before the highlighted token to see if that helps.",
+  "expressions-unexpected-token-value-hint": "Try adding a <b>value</b> $1 the highlighted token to see if that helps.",
+  "expressions-unexpected-token-operator-hint": "Try adding an <b>operator</b> $1 the highlighted token to see if that helps.",
+  "expressions-unexpected-token-rightparen-hint": "Try removing the highlighted parenthesis to see if that helps.",
+  "expressions-before": "before",
+  "expressions-after": "after",
   "expressions-binary-left-type-exception": "the operator `<b>$1</b>` only accepts a <b>$2</b> as its left operand",
   "expressions-binary-right-type-exception": "the operator `<b>$1</b>` only accepts a <b>$2</b> as its right operand",
   "expressions-unary-type-exception": "the operator `<b>$1</b>` only accepts a <b>$2</b> as its operand"
