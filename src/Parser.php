@@ -39,7 +39,7 @@ class Parser
      */
     public function parse()
     {
-        if (count($this->tokens) === 0) {
+        if ($this->atEnd()) {
             return new Node(null, null, null, null, null);
         }
 
@@ -292,9 +292,11 @@ class Parser
 
     /**
      * @return Token
+     * @throws ExpressionException
      */
     private function current()
     {
+        if ($this->atEnd()) $this->throwUnexpectedTokenError($this->tokens[$this->current - 1]);
         return $this->tokens[$this->current];
     }
 
