@@ -283,6 +283,7 @@ class Parser
      * Consumes the current token and returns it.
      *
      * @return Token
+     * @throws ExpressionException
      */
     private function advance()
     {
@@ -296,15 +297,17 @@ class Parser
      */
     private function current()
     {
-        if ($this->atEnd()) $this->throwUnexpectedTokenError($this->tokens[$this->current - 1]);
+        if ($this->atEnd()) $this->throwUnexpectedTokenError($this->previous());
         return $this->tokens[$this->current];
     }
 
     /**
      * @return Token
+     * @throws ExpressionException
      */
     private function previous()
     {
+        if ($this->current === 0) $this->throwUnexpectedTokenError($this->current());
         return $this->tokens[$this->current - 1];
     }
 
