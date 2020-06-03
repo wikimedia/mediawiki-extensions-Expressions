@@ -424,18 +424,32 @@ class Parser
     /**
      * @param Token $token
      * @param string|null $location_hintmsg
-     * @param string|null $hintmsg
      * @throws ExpressionException
      */
     private function throwUnexpectedTokenError(Token $token, $location_hintmsg = null)
     {
         if ($token->getTokenType() === "T_RIGHTPAREN") {
+            $expectedmsg = "expressions-expected-value";
             $hint = wfMessage('expressions-unexpected-token-rightparen-hint')->plain();
         } else if (in_array($token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES)) {
             $location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-before";
+
+            if ($location_hintmsg === "expressions-before") {
+                $expectedmsg = "expressions-expected-operator-before";
+            } else {
+                $expectedmsg = "expressions-expected-operator-after";
+            }
+
             $hint = wfMessage('expressions-unexpected-token-operator-hint', wfMessage($location_hintmsg)->plain())->plain();
         } else {
             $location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-after";
+
+            if ($location_hintmsg === "expressions-before") {
+                $expectedmsg = "expressions-expected-value-before";
+            } else {
+                $expectedmsg = "expressions-expected-value-after";
+            }
+
             $hint = wfMessage('expressions-unexpected-token-value-hint', wfMessage($location_hintmsg)->plain())->plain();
         }
 
@@ -443,7 +457,7 @@ class Parser
             "expressions-unexpected-token",
             $token->getOffset(),
             strlen($token->getMatch()),
-            [htmlspecialchars($token->getMatch()), $hint]
+            [htmlspecialchars($token->getMatch()), $hint, wfMessage($expectedmsg)->plain()]
         );
     }
 }
