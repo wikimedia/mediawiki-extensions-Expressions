@@ -9,15 +9,6 @@ final class Expressions {
 	 * @param \Parser $parser
 	 */
 	public static function onParserFirstCallInit( \Parser $parser ) {
-		spl_autoload_register( function ( $class ) {
-			$class_parts = explode( "\\", $class );
-			array_shift( $class_parts );
-
-			$path = __DIR__ . "/" . implode( "/", $class_parts ) . ".php";
-
-			include_once $path;
-		} );
-
 		$parser->setFunctionHook( 'expression', [ self::class, 'evaluateExpression' ] );
 	}
 
