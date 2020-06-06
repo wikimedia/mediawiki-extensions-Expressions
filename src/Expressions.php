@@ -85,7 +85,7 @@ final class Expressions {
 			$token_length = strlen( $truncated ) - $offset;
 		}
 
-		return "<pre>1|&nbsp;" . htmlspecialchars( str_replace( " ", "&nbsp;", $truncated ) ) . "\n" .
+		return "<pre>1|&nbsp;" . str_replace( " ", "&nbsp;", htmlspecialchars( $truncated ) ) . "\n" .
 			str_repeat( "&nbsp;", $offset + 3 ) .
 			str_repeat( "^", $token_length ) .
 			"</pre>";
