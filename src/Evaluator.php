@@ -49,16 +49,8 @@ class Evaluator {
 				return self::evaluateMinus( $operands[0], $value );
 		}
 
-		throw new ExpressionException(
-			"expressions-unexpected-token",
-			[
-				Expressions::highlightSegment(
-					Expressions::$expression_string,
-					$expression->getOffsetStart(),
-					strlen( $expression->getValue() )
-				)
-			]
-		);
+		// This will (in theory) never happen.
+		throw new \MWException( "Invalid token type" );
 	}
 
 	/**
@@ -242,20 +234,19 @@ class Evaluator {
 		$actual_type = gettype( self::evaluate( $expression ) );
 
 		if ( $actual_type !== $expected_type ) {
-			$highlighted_segment = Expressions::highlightSegment(
-				Expressions::$expression_string,
-				$expression->getOffsetStart(),
-				$expression->getOffsetEnd() - $expression->getOffsetStart()
-			);
-
 			throw new ExpressionException(
-				"expressions-invalid-type",
+				"expressions-invalid-type-message",
+				[],
+				"expressions-invalid-type-submessage",
 				[
-					$highlighted_segment,
 					$expected_type,
-					$actual_type,
-					wfMessage( $errormsg, $operator, $expected_type )->plain()
-				]
+					new ExceptionMessage( $errormsg, [ $operator, $expected_type ] ),
+					$actual_type
+				],
+				"expressions-invalid-type-hint",
+				[],
+				$expression->getOffsetStart(),
+				$expression->getOffsetEnd()
 			);
 		}
 	}

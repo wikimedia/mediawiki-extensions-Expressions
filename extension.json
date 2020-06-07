@@ -24,6 +24,7 @@
   },
   "AutoloadClasses": {
     "Expressions\\Evaluator": "src/Evaluator.php",
+    "Expressions\\ExceptionMessage": "src/ExceptionMessage.php",
     "Expressions\\ExpressionException": "src/ExpressionException.php",
     "Expressions\\Expressions": "src/Expressions.php",
     "Expressions\\Lexer": "src/Lexer.php",

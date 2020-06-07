@@ -273,7 +273,8 @@ class Parser {
 	 * @throws ExpressionException
 	 */
 	private function advance() {
-		if ( !$this->atEnd() ) { $this->current++;
+		if ( !$this->atEnd() ) {
+			$this->current++;
 		}
 		return $this->previous();
 	}
@@ -283,7 +284,8 @@ class Parser {
 	 * @throws ExpressionException
 	 */
 	private function current() {
-		if ( $this->atEnd() ) { $this->throwUnexpectedTokenError( $this->previous(), "expressions-after" );
+		if ( $this->atEnd() ) {
+			$this->throwUnexpectedTokenError( $this->previous(), "expressions-after" );
 		}
 		return $this->tokens[$this->current];
 	}
@@ -293,7 +295,8 @@ class Parser {
 	 * @throws ExpressionException
 	 */
 	private function previous() {
-		if ( $this->current === 0 ) { $this->throwUnexpectedTokenError( $this->current(), "expressions-before" );
+		if ( $this->current === 0 ) {
+			$this->throwUnexpectedTokenError( $this->current(), "expressions-before" );
 		}
 		return $this->tokens[$this->current - 1];
 	}
@@ -387,23 +390,16 @@ class Parser {
 			}
 		}
 
-		throw $this->error( "expressions-unclosed-paren", $idx_current, 1 );
-	}
-
-	/**
-	 * @param string $errormsg
-	 * @param int $offset
-	 * @param int $token_length
-	 * @param array $additional_arguments
-	 * @return ExpressionException
-	 */
-	private function error( $errormsg, $offset, $token_length = 50, $additional_arguments = [] ) {
-		array_unshift(
-			$additional_arguments,
-			Expressions::highlightSegment( Expressions::$expression_string, $offset, $token_length )
+		throw new ExpressionException(
+			"expressions-unclosed-paren-message",
+			[],
+			"expressions-empty-string",
+			[],
+			"expressions-unclosed-paren-hint",
+			[],
+			$idx_current,
+			$idx_current + 1
 		);
-
-		return new ExpressionException( $errormsg, $additional_arguments );
 	}
 
 	/**
@@ -413,41 +409,53 @@ class Parser {
 	 */
 	private function throwUnexpectedTokenError( Token $token, $location_hintmsg = null ) {
 		if ( $token->getTokenType() === "T_RIGHTPAREN" ) {
-			$expectedmsg = "expressions-expected-value";
-			$hint = wfMessage( 'expressions-unexpected-token-rightparen-hint' )->plain();
-		} elseif ( in_array( $token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES ) ) {
-			$location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-before";
+			$expected = new ExceptionMessage( "expressions-expected-value" );
 
-			if ( $location_hintmsg === "expressions-before" ) {
-				$expectedmsg = "expressions-expected-operator-before";
-			} else {
-				$expectedmsg = "expressions-expected-operator-after";
-			}
-
-			$hint = wfMessage(
-				'expressions-unexpected-token-operator-hint',
-				wfMessage( $location_hintmsg )->plain()
-			)->plain();
-		} else {
-			$location_hintmsg = $location_hintmsg ? $location_hintmsg : "expressions-after";
-
-			if ( $location_hintmsg === "expressions-before" ) {
-				$expectedmsg = "expressions-expected-value-before";
-			} else {
-				$expectedmsg = "expressions-expected-value-after";
-			}
-
-			$hint = wfMessage(
-				'expressions-unexpected-token-value-hint',
-				wfMessage( $location_hintmsg )->plain()
-			)->plain();
+			throw new ExpressionException(
+				"expressions-unexpected-token-message",
+				[],
+				"expressions-unexpected-token-submessage",
+				[ $expected, $token->getMatch() ],
+				"expressions-unexpected-token-rightparen-hint",
+				[],
+				$token->getOffset(),
+				$token->getOffset() + strlen( $token->getMatch() )
+			);
 		}
 
-		throw $this->error(
-			"expressions-unexpected-token",
+		if ( $location_hintmsg === "expressions-before" ) {
+			$expected = "expressions-expected-value-before";
+		} else {
+			$expected = "expressions-expected-value-after";
+		}
+
+		if ( in_array( $token->getTokenType(), self::VALUE_HINT_TOKEN_TYPES ) ) {
+			if ( $location_hintmsg !== null ) {
+				$location_hint = new ExceptionMessage( $location_hintmsg );
+			} else {
+				$location_hint = new ExceptionMessage( "expressions-before" );
+			}
+
+			$hint = "expressions-unexpected-token-value-hint";
+		} else {
+			if ( $location_hintmsg !== null ) {
+				$location_hint = new ExceptionMessage( $location_hintmsg );
+			} else {
+				$location_hint = new ExceptionMessage( "expressions-before" );
+			}
+
+			$hint = "expressions-unexpected-token-operator-hint";
+		}
+
+		throw new ExpressionException(
+			"expressions-unexpected-token-message",
+			[],
+			"expressions-unexpected-token-submessage",
+			[ $token->getMatch(), new ExceptionMessage( $expected ) ],
+			$hint,
+			[ $location_hint ],
 			$token->getOffset(),
-			strlen( $token->getMatch() ),
-			[ htmlspecialchars( $token->getMatch() ), $hint, wfMessage( $expectedmsg )->plain() ]
+			$token->getOffset() + strlen( $token->getMatch() )
 		);
 	}
 }

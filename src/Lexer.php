@@ -70,8 +70,14 @@ class Lexer {
 		}
 
 		throw new ExpressionException(
-			"expressions-unidentified-token",
-			[ Expressions::highlightSegment( $expression_string, $offset + $trim_size, 1 ) ]
+			"expressions-unidentified-token-message",
+			[],
+			"expressions-unidentified-token-submessage",
+			[],
+			"expressions-unidentified-token-hint",
+			[],
+			$offset_start,
+			$offset_start + 1
 		);
 	}
 }

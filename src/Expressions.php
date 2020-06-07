@@ -17,7 +17,7 @@ final class Expressions {
 	 * @param string $expression_string
 	 * @param string $consequent
 	 * @param string $alternate
-	 * @return string|array
+	 * @return string
 	 */
 	public static function evaluateExpression(
 		\Parser $parser,
@@ -35,42 +35,87 @@ final class Expressions {
 
 			return $expression ? $consequent : $alternate;
 		} catch ( ExpressionException $exception ) {
-			return self::error( $exception->getMessageName(), $exception->getMessageParameters() );
+			return self::parseException( $exception );
 		}
 	}
 
 	/**
-	 * @param string $errormsg
+	 * @param ExpressionException $exception
+	 * @return string
+	 */
+	private static function parseException( ExpressionException $exception ) {
+		$message = wfMessage(
+			$exception->getMessageName(),
+			self::parseMessageParameters( $exception->getMessageParameters() )
+		)->plain();
+
+		$highlight_segment = self::highlightSegment(
+			$exception->getOffsetStart(),
+			$exception->getOffsetEnd() - $exception->getOffsetStart()
+		);
+
+		$submessage = wfMessage(
+			$exception->getSubmessageName(),
+			self::parseMessageParameters( $exception->getSubmessageParameters() )
+		)->plain();
+
+		$hint = wfMessage(
+			$exception->getHintName(),
+			self::parseMessageParameters( $exception->getHintParameters() )
+		)->plain();
+
+		return sprintf(
+			"%s\n%s\n%s\n* %s",
+			self::error( $message ),
+			$highlight_segment,
+			self::error( $submessage ),
+			self::error( $hint )
+		);
+	}
+
+	/**
+	 * @param array $parameters
+	 * @return array
+	 */
+	private static function parseMessageParameters( $parameters ) {
+		return array_map( function ( $item ) {
+			if ( $item instanceof ExceptionMessage ) {
+				return wfMessage( $item->getErrorMessage(), $item->getParameters() );
+			}
+
+			return $item;
+		}, $parameters );
+	}
+
+	/**
+	 * @param string $message
 	 * @param array $params
 	 * @return array
 	 */
-	public static function error( $errormsg, $params = [] ) {
-		return [
-			\Html::rawElement(
+	private static function error( $message, $params = [] ) {
+		return \Html::rawElement(
 				'span',
 				[ 'class' => 'error' ],
-				wfMessage( $errormsg, $params )->parse()
-			), 'noparse' => true, 'isHTML' => false
-		];
+				$message
+			);
 	}
 
 	/**
 	 * Highlights the given code segment at the given offset. Used for error reporting.
 	 *
-	 * @param string $expression
 	 * @param int $offset
 	 * @param int $token_length
 	 * @return string
 	 */
-	public static function highlightSegment( $expression, $offset, $token_length ) {
+	private static function highlightSegment( $offset, $token_length ) {
 		$max_expression_length = 60;
 
-		$truncated = mb_substr(
-			$expression,
+		$truncated = substr(
+			self::$expression_string,
 			max( 0, $offset - ( $max_expression_length / 2 ) ), $max_expression_length
 		);
 
-		if ( strlen( $truncated ) < strlen( $expression ) ) {
+		if ( strlen( $truncated ) < strlen( self::$expression_string ) ) {
 			$truncated .= "...";
 		}
 
