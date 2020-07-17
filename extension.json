@@ -20,7 +20,7 @@
 		]
 	},
 	"ExtensionMessagesFiles": {
-		"ExpressionsMagic": "i18n/Expressions.i18n.php"
+		"ExpressionsMagic": "i18n/Expressions.i18n.magic.php"
 	},
 	"AutoloadClasses": {
 		"Expressions\\Evaluator": "src/Evaluator.php",
