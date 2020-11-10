@@ -90,7 +90,7 @@ final class Expressions {
 	/**
 	 * @param string $message
 	 * @param array $params
-	 * @return array
+	 * @return string
 	 */
 	private static function error( $message, $params = [] ) {
 		return \Html::rawElement(

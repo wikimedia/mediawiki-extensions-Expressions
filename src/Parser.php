@@ -66,7 +66,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->implication();
 
-		while ( $this->match( "T_NOT_EQUALS", "T_NOT_EQUALITY", "T_EQUALS", "T_EQUALITY" ) ) {
+		while ( $this->matchesToken( "T_NOT_EQUALS", "T_NOT_EQUALITY", "T_EQUALS", "T_EQUALITY" ) ) {
 			$operator = $this->previous();
 			$right = $this->implication();
 
@@ -90,7 +90,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->disjunction();
 
-		while ( $this->match( "T_IMPLICATION" ) ) {
+		while ( $this->matchesToken( "T_IMPLICATION" ) ) {
 			$operator = $this->previous();
 			$right = $this->disjunction();
 
@@ -114,7 +114,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->conjunction();
 
-		while ( $this->match( "T_DISJUNCTION" ) ) {
+		while ( $this->matchesToken( "T_DISJUNCTION" ) ) {
 			$operator = $this->previous();
 			$right = $this->conjunction();
 
@@ -138,7 +138,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->logicalXor();
 
-		while ( $this->match( "T_CONJUNCTION" ) ) {
+		while ( $this->matchesToken( "T_CONJUNCTION" ) ) {
 			$operator = $this->previous();
 			$right = $this->logicalXor();
 
@@ -162,7 +162,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->comparison();
 
-		while ( $this->match( "T_XOR" ) ) {
+		while ( $this->matchesToken( "T_XOR" ) ) {
 			$operator = $this->previous();
 			$right = $this->comparison();
 
@@ -186,7 +186,7 @@ class Parser {
 		$offset_start = $this->current()->getOffset();
 		$expression = $this->unary();
 
-		while ( $this->match( "T_GREATER", "T_LESS", "T_GREATEREQUAL", "T_LESSEQUAL" ) ) {
+		while ( $this->matchesToken( "T_GREATER", "T_LESS", "T_GREATEREQUAL", "T_LESSEQUAL" ) ) {
 			$operator = $this->previous();
 			$right = $this->unary();
 
@@ -207,7 +207,7 @@ class Parser {
 	 * @throws ExpressionException
 	 */
 	private function unary() {
-		if ( $this->match( "T_NOT", "T_MINUS" ) ) {
+		if ( $this->matchesToken( "T_NOT", "T_MINUS" ) ) {
 			$operator = $this->previous();
 			$right = $this->unary();
 
@@ -226,12 +226,11 @@ class Parser {
 	/**
 	 * Returns true and advances one token if the current token is any of the given token types.
 	 *
+	 * @param string ...$tokens
 	 * @return bool
 	 * @throws ExpressionException
 	 */
-	private function match() {
-		$tokens = func_get_args();
-
+	private function matchesToken( ...$tokens ) {
 		foreach ( $tokens as $token ) {
 			if ( $this->check( $token ) ) {
 				$this->advance();
@@ -306,7 +305,7 @@ class Parser {
 	 * @throws ExpressionException
 	 */
 	private function primary() {
-		if ( $this->match( "T_FALSE" ) ) {
+		if ( $this->matchesToken( "T_FALSE" ) ) {
 			return new Node(
 				null,
 				null,
@@ -316,7 +315,7 @@ class Parser {
 			);
 		}
 
-		if ( $this->match( "T_TRUE" ) ) {
+		if ( $this->matchesToken( "T_TRUE" ) ) {
 			return new Node(
 				null,
 				null,
@@ -326,7 +325,7 @@ class Parser {
 			);
 		}
 
-		if ( $this->match( "T_NUMBER" ) ) {
+		if ( $this->matchesToken( "T_NUMBER" ) ) {
 			return new Node(
 				null,
 				null,
@@ -336,7 +335,7 @@ class Parser {
 			);
 		}
 
-		if ( $this->match( "T_STRING" ) ) {
+		if ( $this->matchesToken( "T_STRING" ) ) {
 			return new Node(
 				null,
 				null,
@@ -346,7 +345,7 @@ class Parser {
 			);
 		}
 
-		if ( $this->match( "T_LEFTPAREN" ) ) {
+		if ( $this->matchesToken( "T_LEFTPAREN" ) ) {
 			$start_offset = $this->previous()->getOffset();
 			$expression = $this->expression();
 			$this->consumeRightParenthesis();
@@ -384,9 +383,11 @@ class Parser {
 		while ( $open_parenthesis > 0 && $idx_current > 0 ) {
 			$character = Expressions::$expression_string[--$idx_current];
 
-			if ( $character === '(' ) { $open_parenthesis--;
+			if ( $character === '(' ) {
+				$open_parenthesis--;
 			}
-			if ( $character === ')' ) { $open_parenthesis++;
+			if ( $character === ')' ) {
+				$open_parenthesis++;
 			}
 		}
 

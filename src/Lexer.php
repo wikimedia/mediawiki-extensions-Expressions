@@ -36,7 +36,7 @@ class Lexer {
 
 		$offset = 0;
 		while ( $offset < strlen( $expression_string ) ) {
-			list( $match, $token ) = self::match( $expression_string, $offset, $offset_start );
+			[ $match, $token ] = self::nextMatch( $expression_string, $offset, $offset_start );
 			$tokens[] = new Token( $match, $token, $offset_start );
 		}
 
@@ -50,7 +50,7 @@ class Lexer {
 	 * @return array
 	 * @throws ExpressionException
 	 */
-	public static function match( $expression_string, &$offset, &$offset_start ) {
+	public static function nextMatch( $expression_string, &$offset, &$offset_start ) {
 		$string = substr( $expression_string, $offset );
 		$trimmed_string = ltrim( $string );
 
