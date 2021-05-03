@@ -78,7 +78,7 @@ final class Expressions {
 	 * @return array
 	 */
 	private static function parseMessageParameters( $parameters ) {
-		return array_map( function ( $item ) {
+		return array_map( static function ( $item ) {
 			if ( $item instanceof ExceptionMessage ) {
 				return wfMessage( $item->getErrorMessage(), $item->getParameters() );
 			}
