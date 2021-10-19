@@ -416,7 +416,7 @@ class Parser {
 				"expressions-unexpected-token-message",
 				[],
 				"expressions-unexpected-token-submessage",
-				[ $expected, $token->getMatch() ],
+				[ $token->getMatch(), $expected ],
 				"expressions-unexpected-token-rightparen-hint",
 				[],
 				$token->getOffset(),
@@ -437,7 +437,7 @@ class Parser {
 				$location_hint = new ExceptionMessage( "expressions-before" );
 			}
 
-			$hint = "expressions-unexpected-token-value-hint";
+			$hint = "expressions-unexpected-token-operator-hint";
 		} else {
 			if ( $location_hintmsg !== null ) {
 				$location_hint = new ExceptionMessage( $location_hintmsg );
@@ -445,7 +445,7 @@ class Parser {
 				$location_hint = new ExceptionMessage( "expressions-before" );
 			}
 
-			$hint = "expressions-unexpected-token-operator-hint";
+			$hint = "expressions-unexpected-token-value-hint";
 		}
 
 		throw new ExpressionException(

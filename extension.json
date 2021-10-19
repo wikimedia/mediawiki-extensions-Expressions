@@ -6,7 +6,7 @@
 	"author": [
 		"[https://mediawiki.org/wiki/User:Xxmarijnw Marijn van Wezel]"
 	],
-	"version": "1.4",
+	"version": "1.5",
 	"url": "https://www.mediawiki.org/wiki/Extension:Expressions",
 	"descriptionmsg": "expressions-desc",
 	"license-name": "MIT",

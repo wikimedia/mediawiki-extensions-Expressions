@@ -240,8 +240,8 @@ class Evaluator {
 				"expressions-invalid-type-submessage",
 				[
 					$expected_type,
-					new ExceptionMessage( $errormsg, [ $operator, $expected_type ] ),
-					$actual_type
+					$actual_type,
+					new ExceptionMessage( $errormsg, [ $operator, $expected_type ] )
 				],
 				"expressions-invalid-type-hint",
 				[],
