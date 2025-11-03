@@ -11,7 +11,7 @@
 	"descriptionmsg": "expressions-desc",
 	"license-name": "MIT",
 	"requires": {
-		"MediaWiki": ">= 1.27.0"
+		"MediaWiki": ">= 1.40.0"
 	},
 	"MessagesDirs": {
 		"Expressions": [

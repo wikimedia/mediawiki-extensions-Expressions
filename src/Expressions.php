@@ -2,6 +2,8 @@
 
 namespace Expressions;
 
+use MediaWiki\Html\Html;
+
 final class Expressions {
 	public static $expression_string;
 
@@ -93,7 +95,7 @@ final class Expressions {
 	 * @return string
 	 */
 	private static function error( $message, $params = [] ) {
-		return \Html::rawElement(
+		return Html::rawElement(
 				'span',
 				[ 'class' => 'error' ],
 				$message
